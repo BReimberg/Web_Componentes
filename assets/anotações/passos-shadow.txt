@@ -1,0 +1,146 @@
+=============================================================
+Passos para criar Shadow Dom
+=============================================================
+class CardNews extends HTMLElement {
+    constructor() {
+        //invocar o método construtor de que está herdando;
+        super();
+
+        //criar uma sombra aberta e adiciona o código em html
+        const shadow = this.attachShadow({mode: "open"});
+        shadow.innerHTML = "Olá, Mundo!";
+    }
+}
+
+/* Criação de um elemento costumizado definindo através do 
+seletor 'card-news' e a classe/método construtor */
+customElements.define('card-news', CardNews)
+
+=============================================================
+Criar base do component e estilo do component
+=============================================================
+class TituloDinamico extends HTMLElement {
+    constructor() {
+        super();
+
+        const shadow = this.attachShadow({mode: "open"});
+
+        //base do component
+        const componentRoot = document.createElement("h1");
+        componentRoot.textContent = this.getAttribute("titulo");
+
+        //estilizar o component
+        const style = document.createElement("style");
+        style.textContent = `
+            h1 {
+                color: red;
+            }
+        `;
+
+        //enviar para a shadow
+        shadow.appendChild(componentRoot)
+        shadow.appendChild(style)
+    }
+}
+
+customElements.define('titulo-dinamico', TituloDinamico)
+
+=============================================================
+CardNews com anotações
+=============================================================
+class CardNews extends HTMLElement {
+    constructor() {
+        super();
+
+        const shadow = this.attachShadow({ mode: "open" });
+        shadow.appendChild(this.build());
+        shadow.appendChild(this.styles());
+    }
+
+    build() {
+        //div card
+        const componentRoot = document.createElement("div");
+        componentRoot.setAttribute("class", "card");
+
+        //div card-left
+        const cardLeft = document.createElement("div");
+        cardLeft.setAttribute("class", "card-left");
+
+        //span com o nome do autor
+        const author = document.createElement("span");
+        //adicionar conteúdo dinâmico
+        author.textContent = "By " + (this.getAttribute("author") || "Anonymous");
+
+        //link a, com título do artigo
+        const linkTitle = document.createElement("a");
+        linkTitle.textContent = this.getAttribute("title");
+        linkTitle.href = this.getAttribute("link-url");
+
+        //prévia do artigo
+        const newsContent = document.createElement("p");
+        newsContent.textContent = this.getAttribute("content")
+
+        //adicionando o span, link e p no cardLeft
+        cardLeft.appendChild(author);
+        cardLeft.appendChild(linkTitle);
+        cardLeft.appendChild(newsContent);
+
+        //div card-right
+        const cardRight = document.createElement("div");
+        cardRight.setAttribute("class", "card-right");
+
+        //imagem do artigo
+        const newsImg = document.createElement("img");
+        newsImg.src = (this.getAttribute("photo") || "./assets/img/default-img.jpg");
+        newsImg.alt = "Foto da notícia"
+
+        //adicionando img ao cardRight
+        cardRight.appendChild(newsImg);
+
+        componentRoot.appendChild(cardLeft);
+        componentRoot.appendChild(cardRight);
+
+        return componentRoot;
+    }
+
+    styles() {
+        const style = document.createElement("style");
+        style.textContent = `
+            .card {
+                width: 80%;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                box-shadow: 8px 8px 24px -3px rgba(0,0,0,0.64);
+                -webkit-box-shadow: 8px 8px 24px -3px rgba(0,0,0,0.64);
+                -moz-box-shadow: 8px 8px 24px -3px rgba(0,0,0,0.64);
+            }
+    
+            .card-left {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding-left: 10px;
+            }
+    
+            .card-left > span {
+                font-weight: 400;
+            }
+    
+            .card-left > a {
+                margin-top: 15px;
+                font-size: 25pt;
+                text-decoration: none;
+                font-weight: bold;
+            }
+    
+            .card-left > p {
+                color: rgb(102, 102, 102);
+            }
+        `
+
+        return style;
+    }
+}
+
+customElements.define("card-news", CardNews)
